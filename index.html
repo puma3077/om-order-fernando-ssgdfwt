@@ -178,7 +178,7 @@ textarea.copybox{width:100%;height:120px;margin-bottom:8px;font-size:12px}
 .chip.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--plum)}
 .chip.cur{box-shadow:0 0 0 2px var(--card),0 0 0 5px var(--plum)}
 /* adjust panel */
-.ed{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;border-radius:14px;background:var(--panel);box-shadow:inset 0 0 0 2px var(--plum)}
+.ed{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;border-radius:14px;background:var(--pink-soft);box-shadow:0 8px 20px -12px rgba(29,23,32,.45)}
 .ed .sw{width:44px;height:44px;border-radius:10px}
 .ed .nm{flex:1;min-width:0;font-size:.9rem;line-height:1.2}
 .ed .nm b{font-weight:800}
@@ -227,8 +227,9 @@ textarea.copybox{width:100%;height:120px;margin-bottom:8px;font-size:12px}
 .ptiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:10px 8px;margin-top:10px}
 .ptile{position:relative;display:flex;flex-direction:column;gap:3px;padding:6px 6px 8px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;
   user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.ptile.on{border-color:var(--plum);background:var(--panel)}
-.ptile.cur{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--plum);border-color:var(--plum)}
+.ptile.on{border-color:var(--pink);background:var(--pink-soft)}
+.ptile.cur{background:var(--pink);border-color:var(--pink);color:#1d1720;box-shadow:0 6px 16px -8px rgba(29,23,32,.45)}
+.ptile.cur small{color:rgba(29,23,32,.72)}
 .pt-img{position:relative;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:var(--panel);margin-bottom:3px}
 .pt-img.noimg{aspect-ratio:2/1}
 .pt-img[style] img{height:calc(100% - 7px)}
@@ -251,7 +252,14 @@ textarea.copybox{width:100%;height:120px;margin-bottom:8px;font-size:12px}
 .ed.ed-multi{flex-direction:column;align-items:stretch;gap:8px;padding:10px 12px 12px!important}
 .ed-top{display:flex;align-items:center;gap:10px;padding-right:26px}
 .ed-var{display:flex;align-items:center;gap:10px;padding:6px 6px 6px 10px;border-radius:12px;background:var(--card);border:1.5px solid var(--line)}
-.ed-var.on{border-color:var(--plum)}
+.ed-var.on{background:var(--pink-soft);border-color:var(--pink)}
+.ed-var .vt{position:relative;width:46px;height:46px;flex:none;border-radius:10px;overflow:hidden;background:var(--panel)}
+.ed-var .vt img{width:100%;height:100%;object-fit:cover;display:block}
+.ed-var .vt i{position:absolute;left:0;right:0;bottom:0;font-style:normal;font-size:.56rem;font-weight:800;text-align:center;background:rgba(29,23,32,.78);color:#fff;padding:1px 0;letter-spacing:.02em}
+.ed-var .vt.big i{background:var(--plum);color:var(--plum-ink)}
+.pt-sizes{position:absolute;left:4px;right:4px;bottom:4px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+.pt-sizes i{font-style:normal;font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:999px;background:rgba(255,255,255,.94);color:#1d1720;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.pt-sizes i.big{background:var(--plum);color:var(--plum-ink)}
 .ed-var .vl{flex:1;min-width:0;line-height:1.2}
 .ed-var .vl b{font-weight:800;font-size:.86rem;display:block}
 .ed-var .vl small{color:var(--muted);font-size:.72rem}
@@ -497,7 +505,8 @@ function renderEd(){
     if(last.nextElementSibling!==ed) last.after(ed);
     const [base]=splitSize(i);
     ed.innerHTML=`<div class="ed-top">${i.photoSrc?`<img class="sw ed-img" src="${i.photoSrc}" alt="">`:`<span class="sz ed-sz">${sizeHTML(i)}</span>`}<div class="nm"><b>${esc(i.title||base)}</b><small>${gqty(i)?gqty(i)+" in order":"Tap again to add "+esc(splitSize(i)[1]||"the first size")+" · or tap a size below"}</small></div><button type="button" class="x" id="ed-x" aria-label="Hide">×</button></div>`
-      + variants(i).map(v=>`<div class="ed-var${qty(v.c)?" on":""}"><div class="vl" role="button" tabindex="0" data-inc="${esc(v.c)}" aria-label="Add one ${esc(v.n)}"><b>${esc(v.vl||splitSize(v)[1])}</b><small>${v.p!=null?money(v.p)+" salon":""}${v.r?" · "+money(v.r)+" retail":""}</small></div>${stepHTML(v.c)}</div>`).join("");
+      + variants(i).map((v,k,a)=>{ const big=a.length>1&&k===a.length-1; const vimg=v.photoSrc||i.photoSrc;
+          return `<div class="ed-var${qty(v.c)?" on":""}">${vimg?`<span class="vt${big?" big":""}"><img src="${vimg}" alt=""><i>${esc(splitSize(v)[1]||"")}</i></span>`:""}<div class="vl" role="button" tabindex="0" data-inc="${esc(v.c)}" aria-label="Add one ${esc(v.n)}"><b>${esc(v.vl||splitSize(v)[1])}</b><small>${v.p!=null?money(v.p)+" salon":""}${v.r?" · "+money(v.r)+" retail":""}</small></div>${stepHTML(v.c)}</div>`; }).join("");
     return;
   }
   const ed=old||document.createElement("div"); ed.id="ed"; ed.className="ed";
@@ -537,7 +546,7 @@ function ptileHTML(i){
   const img = i.photoSrc ? `<img src="${i.photoSrc}" alt="" loading="lazy">` : `<span class="sz"${t&&t.color?` style="background:${t.color}"`:""}>${sizeHTML(i)}</span>`;
   const stripe = i.stripe ? ` style="box-shadow:inset 0 -7px 0 ${i.stripe}"` : "";
   return `<div class="ptile${t?" dtile":""}${q?" on":""}${i.c===editing?" cur":""}" role="button" tabindex="0" data-add="${esc(i.c)}" aria-label="${esc(i.n)}${t?", "+esc(t.text):""}, quantity ${q}">
-    <div class="pt-img${i.photoSrc||t?"":" noimg"}"${stripe}>${img}</div>${q?`<span class="q">${q}</span>`:""}
+    <div class="pt-img${i.photoSrc||t?"":" noimg"}"${stripe}>${img}${i.vg&&q?`<span class="pt-sizes">${variants(i).map((v,k,a)=>qty(v.c)?`<i class="${a.length>1&&k===a.length-1?"big":""}">${esc(splitSize(v)[1])} ×${qty(v.c)}</i>`:"").join("")}</span>`:""}</div>${q?`<span class="q">${q}</span>`:""}
     <b>${esc(i.title||n0)}</b>${t?`<span class="use" style="--uc:${t.color}">${esc(t.text)}</span><small>${esc(t.sub||"")}</small>`:`<small>${size?esc(size)+(i.vg?"":" · "):""}${i.vg?"":(i.p!=null?money(i.p):"")}</small>`}</div>`;
 }
 function rowHTML(i){
